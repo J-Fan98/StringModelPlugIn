@@ -8,7 +8,8 @@
 
 #ifndef Voice_h
 #define Voice_h
-
+#include "CustomOscillator.h"
+#include "WaveguideString.h"
 //==============================================================================
 class Voice  : public juce::MPESynthesiserVoice
 {
