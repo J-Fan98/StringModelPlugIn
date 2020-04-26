@@ -11,7 +11,6 @@
 
 
 #include <JuceHeader.h>
-#include "DSPDelayLineTutorial_02.h"
 
 template <typename Type>
 class CustomOscillator
