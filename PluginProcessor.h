@@ -61,7 +61,9 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MyStringModelPlugInAudioProcessor)
     
     AudioProcessorValueTreeState parameters;
-    float* detuneParam;
+    float* delTimeParameter;
+    float* wetLevelParameter;
+    float* pickupPosParameter;
 
     AudioEngine audioEngine;
 };
