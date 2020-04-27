@@ -11,6 +11,7 @@
 #include "Voice.h"
 #include "Distortion.h"
 #include "CabSimulator.h"
+#include "DelayLine.h"
 
 class AudioEngine  : public juce::MPESynthesiser
 {
@@ -36,6 +37,24 @@ public:
 
         fxChain.prepare (spec);
     }
+    
+    void setPickupPosition(float newPos)
+    {
+        for (auto* v : voices)
+            dynamic_cast<Voice*> (v)->setPickupPos (newPos);
+               
+    }
+    void setDelayTime(float newTime)
+    {
+        fxChain.get<delayIndex>().setDelayTime(0, newTime);
+        fxChain.get<delayIndex>().setDelayTime(1, newTime);
+    }
+    
+    void setWetLevel(float newLevel)
+    {
+        fxChain.get<delayIndex>().setWetLevel(newLevel);
+    }
+
 
 private:
     //==============================================================================
