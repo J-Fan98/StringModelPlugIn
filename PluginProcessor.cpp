@@ -24,13 +24,16 @@ MyStringModelPlugInAudioProcessor::MyStringModelPlugInAudioProcessor()
                        ),
 #endif
 parameters(*this, nullptr, "ParamTreeID", {
-    std::make_unique<AudioParameterFloat>("detune","Detune (Hz)", 0.0f, 20.0f, 2.0f),
-    //std::make_unique<AudioParameterFloat>("del_time", "Delay Time", 0.01f, 0.99f, 0.25f),
+    std::make_unique<AudioParameterFloat>("del_time", "Delay Time", 0.01f, 0.99f, 0.25f),
+    std::make_unique<AudioParameterFloat>("wet_level", "Wet Level", 0.01f, 0.99f, 0.8f),
+    std::make_unique<AudioParameterFloat>("pickup_pos", "Pick up Position", 0.01f, 0.99f, 0.8f),
     
 })
 {
-    detuneParam = parameters.getRawParameterValue("detune");
-    //delTimeParameter = parameters.getRawParameterValue("del_time");
+
+    delTimeParameter = parameters.getRawParameterValue("del_time");
+    wetLevelParameter = parameters.getRawParameterValue("wet_level");
+    pickupPosParameter = parameters.getRawParameterValue("pickup_pos");
   
 }
 
@@ -159,6 +162,12 @@ void MyStringModelPlugInAudioProcessor::processBlock (AudioBuffer<float>& buffer
     // the samples and the outer loop is handling the channels.
     // Alternatively, you can process the samples with the channels
     // interleaved by keeping the same state.
+ 
+ 
+    audioEngine.setDelayTime(*delTimeParameter);
+    audioEngine.setWetLevel(*wetLevelParameter);
+    audioEngine.setPickupPosition(*pickupPosParameter);
+
     
     audioEngine.renderNextBlock (buffer, midiMessages, 0, buffer.getNumSamples());
 }
@@ -171,7 +180,7 @@ bool MyStringModelPlugInAudioProcessor::hasEditor() const
 
 AudioProcessorEditor* MyStringModelPlugInAudioProcessor::createEditor()
 {
-    return new MyStringModelPlugInAudioProcessorEditor (*this);
+    return new GenericAudioProcessorEditor (*this);
 }
 
 //==============================================================================
