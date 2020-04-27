@@ -43,6 +43,7 @@ public:
         auto& stringModel = processorChain.get<stringIndex>();
         stringModel.setFrequency (freqHz);
         stringModel.trigger (velocity);
+        isNoteStart = true;
     }
 
     //==============================================================================
@@ -57,7 +58,17 @@ public:
     {
         processorChain.get<oscIndex>().setLevel (0.0f);
     }
-
+    
+    void setPickupPos (float newPos)
+    {
+        if(isNoteStart == true)
+        {
+            pickupPos = newPos;
+            processorChain.get<stringIndex>().setPickupPosition(pickupPos);
+        }
+        
+       // processorChain.get<stringIndex>().setPickupPosition(pickupPos);
+    }
     //==============================================================================
     void notePressureChanged() override {}
     void noteTimbreChanged() override   {}
@@ -103,7 +114,9 @@ private:
     //==============================================================================
     juce::HeapBlock<char> heapBlock;
     juce::dsp::AudioBlock<float> tempBlock;
-
+    
+    bool isNoteStart = false;
+    float pickupPos;
     enum
     {
         oscIndex,
