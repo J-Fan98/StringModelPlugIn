@@ -64,6 +64,15 @@ private:
     float* delTimeParameter;
     float* wetLevelParameter;
     float* pickupPosParameter;
+    
+    float* decayTimeParameter;
+    float* triggerPosParameter;
+    
+    float* attackParameter;
+    float* decayParameter;
+    float* sustainParameter;
+    float* releaseParameter;
+    
 
     AudioEngine audioEngine;
 };
