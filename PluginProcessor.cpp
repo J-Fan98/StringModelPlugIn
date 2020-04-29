@@ -27,6 +27,13 @@ parameters(*this, nullptr, "ParamTreeID", {
     std::make_unique<AudioParameterFloat>("del_time", "Delay Time", 0.01f, 0.99f, 0.25f),
     std::make_unique<AudioParameterFloat>("wet_level", "Wet Level", 0.01f, 0.99f, 0.8f),
     std::make_unique<AudioParameterFloat>("pickup_pos", "Pick up Position", 0.01f, 0.99f, 0.8f),
+    std::make_unique<AudioParameterFloat>("decay_time", "Decay Time", 0.01f, 0.99f, 0.5f),
+    std::make_unique<AudioParameterFloat>("trigger_pos", "Trigger Position",0.01f, 0.99f, 0.2f),
+    std::make_unique<AudioParameterFloat>("attack_val", "Attack",0.01f, 0.99f, 0.1f),
+    std::make_unique<AudioParameterFloat>("decay_val", "Decay",0.01f, 0.99f, 0.1f),
+    std::make_unique<AudioParameterFloat>("sustain_val", "Sustain",0.01f, 0.99f, 0.99f),
+    std::make_unique<AudioParameterFloat>("release_val", "Release",0.01f, 0.99f, 0.1f),
+    
     
 })
 {
@@ -34,6 +41,13 @@ parameters(*this, nullptr, "ParamTreeID", {
     delTimeParameter = parameters.getRawParameterValue("del_time");
     wetLevelParameter = parameters.getRawParameterValue("wet_level");
     pickupPosParameter = parameters.getRawParameterValue("pickup_pos");
+    decayTimeParameter = parameters.getRawParameterValue("decay_time");
+    triggerPosParameter = parameters.getRawParameterValue("trigger_pos");
+    attackParameter = parameters.getRawParameterValue("attack_val");
+    decayParameter = parameters.getRawParameterValue("decay_val");
+    sustainParameter = parameters.getRawParameterValue("sustain_val");
+    releaseParameter = parameters.getRawParameterValue("release_val");
+    
   
 }
 
@@ -167,6 +181,9 @@ void MyStringModelPlugInAudioProcessor::processBlock (AudioBuffer<float>& buffer
     audioEngine.setDelayTime(*delTimeParameter);
     audioEngine.setWetLevel(*wetLevelParameter);
     audioEngine.setPickupPosition(*pickupPosParameter);
+    audioEngine.setDecayTime(*decayTimeParameter);
+    audioEngine.setTriggerPosition(*triggerPosParameter);
+    audioEngine.setADSRParameters(*attackParameter, *decayParameter, *sustainParameter, *releaseParameter);
 
     
     audioEngine.renderNextBlock (buffer, midiMessages, 0, buffer.getNumSamples());
@@ -189,12 +206,21 @@ void MyStringModelPlugInAudioProcessor::getStateInformation (MemoryBlock& destDa
     // You should use this method to store your parameters in the memory block.
     // You could do that either as raw data, or use the XML or ValueTree classes
     // as intermediaries to make it easy to save and load complex data.
+    auto state = parameters.copyState();
+    std::unique_ptr<XmlElement> xml (state.createXml());
+    copyXmlToBinary (*xml, destData);
 }
 
 void MyStringModelPlugInAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
 {
     // You should use this method to restore your parameters from this memory block,
     // whose contents will have been created by the getStateInformation() call.
+  
+   std::unique_ptr<XmlElement> xmlState (getXmlFromBinary (data, sizeInBytes));
+           
+           if (xmlState.get() != nullptr)
+               if (xmlState->hasTagName (parameters.state.getType()))
+                   parameters.replaceState (ValueTree::fromXml (*xmlState));
 }
 
 //==============================================================================
