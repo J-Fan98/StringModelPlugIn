@@ -44,6 +44,13 @@ public:
             dynamic_cast<Voice*> (v)->setPickupPos (newPos);
                
     }
+    void setTriggerPosition(float newPos)
+    {
+        for (auto* v : voices)
+            dynamic_cast<Voice*> (v)->setTriggerPos(newPos);
+               
+    }
+    
     void setDelayTime(float newTime)
     {
         fxChain.get<delayIndex>().setDelayTime(0, newTime);
@@ -53,6 +60,18 @@ public:
     void setWetLevel(float newLevel)
     {
         fxChain.get<delayIndex>().setWetLevel(newLevel);
+    }
+    
+    void setDecayTime(float newTime)
+    {
+        for (auto* v : voices)
+            dynamic_cast<Voice*> (v)->setDecayTime(newTime);
+    }
+    
+    void setADSRParameters(float attack, float decay, float sustain, float release)
+    {
+        for (auto* v : voices)
+            dynamic_cast<Voice*> (v)->getEnvelopeParameter(attack, decay, sustain, release);
     }
 
 
