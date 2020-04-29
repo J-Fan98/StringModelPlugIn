@@ -16,9 +16,9 @@ public:
     //==============================================================================
     WaveguideString()
     {
-        setTriggerPosition (Type (0.2));
+        //setTriggerPosition (Type (0.2));
         //setPickupPosition (Type (0.8));
-        setDecayTime (Type (0.5));
+        //setDecayTime (Type (0.5));
     }
 
     //==============================================================================
