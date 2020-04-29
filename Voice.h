@@ -28,6 +28,7 @@ public:
     {
         tempBlock = juce::dsp::AudioBlock<float> (heapBlock, spec.numChannels, spec.maximumBlockSize);
         processorChain.prepare (spec);
+        env.setSampleRate (spec.sampleRate);
     }
 
     //==============================================================================
@@ -39,11 +40,19 @@ public:
         processorChain.get<oscIndex>().setFrequency (freqHz, true);
 
         //processorChain.get<oscIndex>().setLevel (velocity);
+        
+        processorChain.get<stringIndex>().setPickupPosition(pickupPosValue);
+        processorChain.get<stringIndex>().setDecayTime(decayTimeValue);
+        processorChain.get<stringIndex>().setTriggerPosition(triggerPosValue);
+
+        env.noteOn();
+        env.setParameters(adsrParams);
+
 
         auto& stringModel = processorChain.get<stringIndex>();
         stringModel.setFrequency (freqHz);
         stringModel.trigger (velocity);
-        isNoteStart = true;
+
     }
 
     //==============================================================================
@@ -56,19 +65,34 @@ public:
     //==============================================================================
     void noteStopped (bool) override
     {
+        env.noteOff();
         processorChain.get<oscIndex>().setLevel (0.0f);
     }
     
     void setPickupPos (float newPos)
     {
-        if(isNoteStart == true)
-        {
-            pickupPos = newPos;
-            processorChain.get<stringIndex>().setPickupPosition(pickupPos);
-        }
-        
-       // processorChain.get<stringIndex>().setPickupPosition(pickupPos);
+        pickupPosValue = newPos;
     }
+    
+    void setTriggerPos(float newPos)
+    {
+        triggerPosValue = newPos;
+    }
+    
+    void setDecayTime (float newDecayTime)
+    {
+        decayTimeValue = newDecayTime;
+    }
+    
+    
+    void getEnvelopeParameter(float attack, float decay, float sustain, float release)
+    {
+        adsrParams.attack = attack;
+        adsrParams.decay = decay;
+        adsrParams.sustain = sustain;
+        adsrParams.release = release;
+    }
+    
     //==============================================================================
     void notePressureChanged() override {}
     void noteTimbreChanged() override   {}
@@ -103,6 +127,8 @@ public:
             juce::dsp::AudioBlock<float> (outputBuffer)
                 .getSubBlock ((size_t) startSample, (size_t) numSamples)
                 .add (tempBlock);
+            //env.applyEnvelopeToBuffer (outputBuffer, startSample, numSamples);
+            
         }
         else
         {
@@ -115,8 +141,13 @@ private:
     juce::HeapBlock<char> heapBlock;
     juce::dsp::AudioBlock<float> tempBlock;
     
-    bool isNoteStart = false;
-    float pickupPos;
+    float pickupPosValue;
+    float decayTimeValue;
+    float triggerPosValue;
+
+    ADSR env; // ADSR envelope
+    ADSR::Parameters adsrParams;
+
     enum
     {
         oscIndex,
